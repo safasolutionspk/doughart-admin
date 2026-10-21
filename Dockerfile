@@ -9,9 +9,12 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Baked into the client bundle — must be the public browser-reachable API URL
+ARG NEXT_PUBLIC_API_URL=http://localhost:5000
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# Loads NEXT_PUBLIC_* from admin/.env.local during `next build`
 RUN npm run build
 
 # ---- runner ----
