@@ -37,7 +37,7 @@ export function CakeGridCard({
           image={cake.image}
           alt={cake.name}
           fill
-          className="object-cover object-center"
+          imageDisplay={cake.imageDisplay}
         />
       </div>
 

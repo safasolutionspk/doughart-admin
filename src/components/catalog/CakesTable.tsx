@@ -54,7 +54,7 @@ export function CakesTable({
                       image={cake.image}
                       alt={cake.name}
                       fill
-                      className="object-cover"
+                      imageDisplay={cake.imageDisplay}
                     />
                   </div>
                   <div className="min-w-0">

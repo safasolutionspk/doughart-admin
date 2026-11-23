@@ -33,7 +33,7 @@ export function CategoryGridCard({
           image={category.image}
           alt={category.name}
           fill
-          className="object-cover object-center"
+          imageDisplay={category.imageDisplay}
         />
       </div>
 

@@ -47,13 +47,18 @@ export function ImageSetModal({
   );
   const [previewKey, setPreviewKey] = useState(0);
 
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
+  // Reset draft when the modal opens or the source image/display changes.
+  // Adjust during render (React-approved) instead of syncing via useEffect.
+  const resetSignature = open
+    ? `${imageUrl}::${JSON.stringify(value ?? null)}`
+    : "";
+  const [appliedResetSignature, setAppliedResetSignature] =
+    useState(resetSignature);
+  if (open && resetSignature !== appliedResetSignature) {
+    setAppliedResetSignature(resetSignature);
     setDraft(clampImageDisplay(value ?? DEFAULT_IMAGE_DISPLAY));
-    setPreviewKey(Date.now());
-  }, [open, value, imageUrl]);
+    setPreviewKey((key) => key + 1);
+  }
 
   useEffect(() => {
     if (!open) {

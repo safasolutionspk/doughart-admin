@@ -14,6 +14,7 @@ import {
   isCustomCakeOrder,
   resolveCustomCakeReferenceImage,
 } from "@/lib/orders/customCake";
+import { CatalogImage } from "@/components/catalog/CatalogImage";
 import { cn } from "@/lib/cn";
 import {
   fetchOrder,
@@ -238,15 +239,62 @@ export function OrderDetailView({ orderId }: { orderId: string }) {
             <p className="text-xs font-bold uppercase tracking-wide text-brand-muted">
               Line items
             </p>
-            <ul className="mt-2 space-y-1 text-sm text-brand-brown">
-              {order.items.map((item, index) => (
-                <li key={index}>
-                  {item.quantity}× {item.cakeName}
-                  {item.unitPrice > 0
-                    ? ` — ${formatCurrency(item.unitPrice * item.quantity)}`
-                    : ""}
-                </li>
-              ))}
+            <ul className="mt-3 space-y-3 text-sm text-brand-brown">
+              {order.items.map((item, index) => {
+                const showCatalogMedia =
+                  !customCake && Boolean(item.cakeId);
+                return (
+                  <li
+                    key={`${item.cakeName}-${index}`}
+                    className={cn(
+                      showCatalogMedia &&
+                        "flex gap-3 rounded-xl border border-brand-border/50 bg-brand-pink-lighter/15 p-3",
+                    )}
+                  >
+                    {showCatalogMedia ? (
+                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-brand-border/60 bg-brand-pink-lighter sm:h-20 sm:w-20">
+                        {item.catalogImage ? (
+                          <CatalogImage
+                            image={item.catalogImage}
+                            alt={item.cakeName}
+                            fill
+                            className="object-contain object-center"
+                          />
+                        ) : (
+                          <span className="flex h-full w-full items-center justify-center px-1 text-center text-[10px] font-medium text-brand-muted">
+                            {item.catalogMissing
+                              ? "Product unavailable"
+                              : "No image"}
+                          </span>
+                        )}
+                      </div>
+                    ) : null}
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-brand-brown">
+                        {item.quantity}× {item.cakeName}
+                        {item.unitPrice > 0
+                          ? ` — ${formatCurrency(item.unitPrice * item.quantity)}`
+                          : item.unitPrice === 0
+                            ? ` — ${formatCurrency(0)}`
+                            : ""}
+                      </p>
+                      {showCatalogMedia && item.catalogDescription?.trim() ? (
+                        <p className="mt-1 text-xs leading-relaxed text-brand-muted">
+                          {item.catalogDescription.trim()}
+                        </p>
+                      ) : null}
+                      {showCatalogMedia &&
+                      item.catalogMissing &&
+                      !item.catalogDescription?.trim() ? (
+                        <p className="mt-1 text-xs text-brand-muted">
+                          Catalog product no longer available; order name and
+                          price above are preserved.
+                        </p>
+                      ) : null}
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ) : null}

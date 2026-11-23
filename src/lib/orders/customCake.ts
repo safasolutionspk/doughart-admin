@@ -6,15 +6,28 @@ export function dashOr(value?: string | null): string {
   return trimmed ? trimmed : "—";
 }
 
-export function isAwaitingQuote(order: Order): boolean {
-  return (
-    order.totalAmount === 0 &&
-    (order.quotedAmount == null || order.quotedAmount === 0)
-  );
+/** Catalog checkouts always include items[].cakeId; /custom-cake does not. */
+export function orderHasCatalogItem(
+  order: Pick<Order, "items"> | { items?: Array<{ cakeId?: string | null }> },
+): boolean {
+  return (order.items ?? []).some((item) => {
+    if (item.cakeId == null || item.cakeId === "") {
+      return false;
+    }
+    return String(item.cakeId).trim().length > 0;
+  });
 }
 
 export function isCustomCakeOrder(order: Order): boolean {
-  return order.totalAmount === 0;
+  return !orderHasCatalogItem(order);
+}
+
+export function isAwaitingQuote(order: Order): boolean {
+  return (
+    isCustomCakeOrder(order) &&
+    order.totalAmount === 0 &&
+    (order.quotedAmount == null || order.quotedAmount === 0)
+  );
 }
 
 export function canEditCustomCakePrice(order: Order): boolean {

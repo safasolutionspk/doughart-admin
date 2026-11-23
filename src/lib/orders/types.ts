@@ -38,10 +38,12 @@ export type Order = {
   messageOnCake?: string;
   specialInstructions?: string;
   items: Array<{
+    cakeId?: string;
     cakeName: string;
     quantity: number;
     unitPrice: number;
     notes?: string;
+    categorySlug?: string;
     itemTypes?: Array<"cake" | "gift" | "other">;
     cakeDetails?: {
       pounds?: string;
@@ -55,6 +57,10 @@ export type Order = {
     productDetails?: {
       notes?: string;
     };
+    /** Live catalog fields enriched on admin order detail (not stored on order). */
+    catalogImage?: string;
+    catalogDescription?: string;
+    catalogMissing?: boolean;
   }>;
   totalAmount: number;
   quotedAmount?: number;

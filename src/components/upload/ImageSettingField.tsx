@@ -152,7 +152,7 @@ export function ImageSettingField({
                     width: "100%",
                     height: "100%",
                     objectFit: "cover",
-                    objectPosition: "center",
+                    objectPosition: "center 40%",
                   }
             }
           />

@@ -2,6 +2,11 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/cn";
+import {
+  getFramedImageStyle,
+  normalizeImageDisplay,
+  type ImageDisplay,
+} from "@/lib/imageDisplay";
 import { hasStoredImage, resolveImageSrc } from "@/lib/upload/path";
 
 type CatalogImageProps = {
@@ -10,6 +15,13 @@ type CatalogImageProps = {
   className?: string;
   fill?: boolean;
   cacheKey?: number | string;
+  /** Optional pan/zoom metadata from admin Set Image. */
+  imageDisplay?: ImageDisplay | null;
+  /**
+   * How the photo fills the preview frame when no imageDisplay is set.
+   * Defaults to cover for consistent square/thumbnail framing.
+   */
+  objectFit?: "cover" | "contain";
 };
 
 export function CatalogImage({
@@ -18,9 +30,12 @@ export function CatalogImage({
   className,
   fill = false,
   cacheKey,
+  imageDisplay,
+  objectFit = "cover",
 }: CatalogImageProps) {
   const src = hasStoredImage(image) ? resolveImageSrc(image, cacheKey) : "";
-  const resetKey = `${src}|${fill ? "fill" : "nofill"}`;
+  const display = normalizeImageDisplay(imageDisplay);
+  const resetKey = `${src}|${fill ? "fill" : "nofill"}|${objectFit}|${display?.zoom ?? ""}|${display?.x ?? ""}|${display?.y ?? ""}`;
 
   return (
     <CatalogImageInner
@@ -29,6 +44,8 @@ export function CatalogImage({
       alt={alt}
       className={className}
       fill={fill}
+      imageDisplay={display}
+      objectFit={objectFit}
     />
   );
 }
@@ -38,11 +55,15 @@ function CatalogImageInner({
   alt,
   className,
   fill,
+  imageDisplay,
+  objectFit,
 }: {
   src: string;
   alt: string;
   className?: string;
   fill: boolean;
+  imageDisplay?: ImageDisplay;
+  objectFit: "cover" | "contain";
 }) {
   const [failed, setFailed] = useState(false);
 
@@ -60,12 +81,31 @@ function CatalogImageInner({
     );
   }
 
+  if (imageDisplay) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={src}
+        alt={alt}
+        className={className}
+        style={getFramedImageStyle(imageDisplay)}
+        onError={() => setFailed(true)}
+      />
+    );
+  }
+
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={src}
       alt={alt}
-      className={cn(fill ? "absolute inset-0 h-full w-full" : "h-full w-full", className)}
+      className={cn(
+        fill ? "absolute inset-0 h-full w-full" : "h-full w-full",
+        objectFit === "contain"
+          ? "object-contain object-center"
+          : "object-cover object-[center_40%]",
+        className,
+      )}
       onError={() => setFailed(true)}
     />
   );
