@@ -1,4 +1,5 @@
 import { PUBLIC_API_BASE_URL } from "@/lib/api";
+import { rewriteDeadApiOrigin } from "@/lib/config/apiUrl";
 
 const CATALOG_UPLOAD_PREFIX = "/uploads/images";
 const GALLERY_UPLOAD_PREFIX = "/uploads/gallery";
@@ -118,7 +119,7 @@ export function resolveImageSrc(
   let resolved: string;
 
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-    resolved = trimmed;
+    resolved = rewriteDeadApiOrigin(trimmed);
   } else {
     const pathname = getPathname(trimmed);
     const stored = normalizeStoredImagePath(trimmed) ?? pathname;

@@ -45,6 +45,12 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       ...(apiPattern ? [apiPattern] : []),
+      // Always allow the live production API host even if build args were wrong.
+      {
+        protocol: "https",
+        hostname: "api.doughartbakers.com",
+        pathname: "/uploads/**",
+      },
       cloudinaryPattern,
     ],
   },

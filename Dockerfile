@@ -7,6 +7,7 @@ RUN npm ci
 # ---- build ----
 FROM node:20-alpine AS builder
 WORKDIR /app
+# IMPORTANT: use api.doughartbakers.com — NOT api.doughart.com (that host times out).
 ARG NEXT_PUBLIC_API_URL=https://api.doughartbakers.com
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 ENV NEXT_TELEMETRY_DISABLED=1
